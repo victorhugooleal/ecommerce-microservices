@@ -1,8 +1,8 @@
 # Dockerfile multi-stage para aplicação Spring Boot
-FROM openjdk:17-jdk-slim as builder
+FROM eclipse-temurin:17-jdk-alpine AS builder
 
 # Instalar Maven
-RUN apt-get update && apt-get install -y maven
+RUN apk add --no-cache maven
 
 # Diretório de trabalho
 WORKDIR /app
@@ -15,13 +15,14 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage final - runtime
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre-alpine
 
 # Instalar curl para health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl
 
 # Criar usuário não-root para segurança
-RUN addgroup --system spring && adduser --system spring --ingroup spring
+RUN addgroup -g 1001 -S spring && \
+    adduser -u 1001 -S spring -G spring
 USER spring:spring
 
 # Diretório de trabalho
