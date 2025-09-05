@@ -191,15 +191,18 @@ ecommerce-monolith/
 
 ## 🎯 Competência 1 - Implementar Arquiteturas de Microsserviços
 
-*✅ Checkpoint 1 - Infraestrutura Base Implementada*
+*✅ Checkpoint 2 - User Service Completo Implementado*
 
 ### 🎯 Objetivos da Competência 1
 
 - [x] ✅ Separar projeto monolítico em microsserviços distintos
 - [x] ✅ Configurar serviço centralizado de gerenciamento (Spring Cloud Config)
 - [x] ✅ Implementar descoberta de serviços (Eureka)
-- [ ] � Implementar comunicação REST entre microsserviços
-- [ ] 🔄 Completar todos os microsserviços
+- [x] ✅ Implementar API Gateway com roteamento
+- [x] ✅ User Service COMPLETO (13 arquivos, 11 endpoints)
+- [ ] 🔄 Product Service (próximo)
+- [ ] 🔄 Order Service (próximo)
+- [ ] 🔄 Comunicação REST entre microsserviços
 
 ### ✅ Infraestrutura Implementada
 
@@ -221,11 +224,38 @@ ecommerce-monolith/
 - Filtros CORS configurados
 - Integração com Config Server
 
-#### 👥 **User Service (8081)** - Base
-- Estrutura inicial criada
-- Entidade User migrada do monólito
-- Configuração MySQL separada
-- Discovery client configurado
+#### 👥 **User Service (8081)** - ✅ COMPLETO
+- **Estrutura completa** com 13 arquivos implementados
+- **Entity:** User.java com JPA e Lombok
+- **DTOs:** CreateUserDTO, UserResponseDTO, LoginDTO, LoginResponseDTO  
+- **Repository:** UserRepository com queries customizadas
+- **Service:** UserService com lógica de negócio completa
+- **Controller:** 11 endpoints REST com documentação Swagger
+- **Security:** JWT authentication, authorization, filtros
+- **DataLoader:** Usuários de teste pré-configurados
+- **Database:** MySQL separada configurada
+
+##### 📋 **Endpoints User Service:**
+**Públicos (sem auth):**
+- `POST /api/users/register` - Registro de usuários
+- `POST /api/users/login` - Autenticação JWT  
+- `GET /api/users/check-email` - Verificar disponibilidade
+- `GET /api/users/health` - Health check
+
+**Protegidos (JWT required):**
+- `GET /api/users/{id}` - Buscar por ID
+- `GET /api/users` - Listar todos (admin only)
+- `GET /api/users/active` - Listar ativos (admin only)  
+- `PUT /api/users/{id}` - Atualizar usuário
+- `PATCH /api/users/{id}/deactivate` - Desativar (admin only)
+- `PATCH /api/users/{id}/reactivate` - Reativar (admin only)
+- `DELETE /api/users/{id}` - Deletar permanente (admin only)
+
+##### 👤 **Usuários de Teste:**
+- **Admin:** admin@ecommerce.com / admin123
+- **Cliente:** joao.silva@email.com / cliente123
+- **Cliente:** maria.santos@email.com / cliente123  
+- **Cliente (inativo):** pedro.oliveira@email.com / cliente123
 
 ### 📊 Arquitetura Implementada
 
@@ -279,8 +309,24 @@ microservices/
 ├── 📁 user-service/
 │   ├── 📄 pom.xml
 │   ├── 📄 UserServiceApplication.java
-│   ├── 📄 User.java (entity)
-│   └── 📄 application.yml
+│   ├── 📄 application.yml
+│   └── 📁 src/main/java/com/ecommerce/userservice/
+│       ├── 📄 entity/User.java
+│       ├── 📁 dto/
+│       │   ├── 📄 CreateUserDTO.java
+│       │   ├── 📄 UserResponseDTO.java  
+│       │   ├── 📄 LoginDTO.java
+│       │   └── 📄 LoginResponseDTO.java
+│       ├── 📄 repository/UserRepository.java
+│       ├── 📄 service/UserService.java
+│       ├── 📄 controller/UserController.java
+│       ├── 📁 security/
+│       │   ├── 📄 JwtUtils.java
+│       │   ├── 📄 JwtAuthenticationFilter.java
+│       │   └── 📄 JwtAuthenticationEntryPoint.java
+│       └── 📁 config/
+│           ├── 📄 SecurityConfig.java
+│           └── 📄 DataLoader.java
 └── 📄 docker-compose.yml (orquestração completa)
 ```
 
@@ -306,13 +352,57 @@ Todas as configurações dos microsserviços estão centralizadas no Config Serv
 - **Health Checks:** Actuator em todos os serviços
 - **Logging:** Configuração debug para desenvolvimento
 
+### 🎯 User Service - Implementação Detalhada
+
+#### 🏗️ **Arquitetura do User Service**
+
+```
+UserController (REST API)
+    ↓
+UserService (Business Logic)
+    ↓  
+UserRepository (Data Access)
+    ↓
+MySQL Database (Port 3306)
+```
+
+#### 🔐 **Segurança Implementada**
+- **JWT Authentication:** Tokens com expiração de 24h
+- **Role-based Authorization:** ADMIN/CUSTOMER roles
+- **Password Encryption:** BCrypt hashing
+- **Security Filters:** Custom JWT filter chain
+- **Method-level Security:** @PreAuthorize annotations
+
+#### 📊 **DTOs Implementados**
+```java
+CreateUserDTO      → Criação/Atualização de usuários
+UserResponseDTO    → Resposta padronizada da API  
+LoginDTO           → Dados de login (email/password)
+LoginResponseDTO   → Token JWT + dados do usuário
+```
+
+#### 🗃️ **Funcionalidades Principais**
+- **CRUD Completo:** Create, Read, Update, Delete
+- **Soft Delete:** Desativação sem perda de dados
+- **Auditoria:** createdAt/updatedAt automático
+- **Validação:** Bean Validation com mensagens customizadas
+- **Data Loading:** Usuários de teste automáticos
+
+#### 🧪 **Dados de Teste Disponíveis**
+```
+Admin System:    admin@ecommerce.com / admin123
+Customer 1:      joao.silva@email.com / cliente123
+Customer 2:      maria.santos@email.com / cliente123  
+Customer 3:      pedro.oliveira@email.com / cliente123 (inactive)
+```
+
 ### 📋 Próximas Etapas
 
-1. **🏗️ Completar User Service:** Repository, Service, Controller, DTOs
-2. **📱 Criar Product Service:** Migrar do monólito
-3. **🛒 Criar Order Service:** Migrar e implementar comunicação inter-serviços
-4. **🔗 Comunicação REST:** OpenFeign clients
-5. **🧪 Testes de Integração:** Validar comunicação entre serviços
+1. **📱 Criar Product Service:** Migrar catálogo do monólito
+2. **🛒 Criar Order Service:** Migrar gestão de pedidos  
+3. **🔗 Comunicação REST:** OpenFeign clients entre serviços
+4. **🧪 Testes de Integração:** Validar fluxos completos
+5. **🐳 Docker Compose:** Orquestração completa dos serviços
 
 ### 🎯 Critérios de Avaliação Atendidos
 
