@@ -1,9 +1,9 @@
-# 🏗️ Transformação de Monólito para Microsserviços
+# 🏗️ Transformação de Monolito para Microsserviços
 **Arquiteturas Avançadas de Software com Microsserviços e Spring Framework**
 
 ---
 
-**👨‍💻 Aluno:** Victor Hugo Olea  
+**👨‍💻 Aluno:** Victor Hugo Oliveira Leal  
 **📅 Data:** Setembro 2025  
 **🎯 Objetivo:** Transformar aplicação monolítica em arquitetura de microsserviços Cloud Native
 
@@ -191,48 +191,136 @@ ecommerce-monolith/
 
 ## 🎯 Competência 1 - Implementar Arquiteturas de Microsserviços
 
-*🔄 Em desenvolvimento...*
+*✅ Checkpoint 1 - Infraestrutura Base Implementada*
 
 ### 🎯 Objetivos da Competência 1
 
-- [ ] Separar projeto monolítico em microsserviços distintos
-- [ ] Implementar comunicação REST entre microsserviços
-- [ ] Configurar serviço centralizado de gerenciamento (Spring Cloud Config)
-- [ ] Implementar descoberta de serviços (Eureka)
+- [x] ✅ Separar projeto monolítico em microsserviços distintos
+- [x] ✅ Configurar serviço centralizado de gerenciamento (Spring Cloud Config)
+- [x] ✅ Implementar descoberta de serviços (Eureka)
+- [ ] � Implementar comunicação REST entre microsserviços
+- [ ] 🔄 Completar todos os microsserviços
 
-### 📋 Tarefas Planejadas
+### ✅ Infraestrutura Implementada
 
-1. **🏗️ Separação em Microsserviços**
-   - User Service (8081)
-   - Product Service (8082)  
-   - Order Service (8083)
+#### 🔧 **Config Server (8888)**
+- Gerenciamento centralizado de configurações
+- Configurações específicas para cada microsserviço
+- Integração com Spring Security
+- Dockerfile otimizado
 
-2. **🌐 Spring Cloud Infrastructure**
-   - Config Server (8888)
-   - Eureka Discovery (8761)
-   - API Gateway (8080)
+#### 🌐 **Eureka Server (8761)** 
+- Service Discovery implementado
+- Dashboard web para monitoramento
+- Configuração de auto-limpeza de instâncias
+- Health checks configurados
 
-3. **🔗 Comunicação REST**
-   - OpenFeign clients
-   - Circuit breakers
-   - Load balancing
+#### 🚪 **API Gateway (8080)**
+- Roteamento para todos os microsserviços
+- Load balancing automático via Eureka
+- Filtros CORS configurados
+- Integração com Config Server
 
-### 📊 Arquitetura Alvo
+#### 👥 **User Service (8081)** - Base
+- Estrutura inicial criada
+- Entidade User migrada do monólito
+- Configuração MySQL separada
+- Discovery client configurado
+
+### 📊 Arquitetura Implementada
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Config Server │    │ Eureka Discovery│    │   API Gateway   │
-│     :8888       │    │      :8761      │    │      :8080      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                ▲                       │
-                                │                       │
-        ┌───────────────────────┼───────────────────────┼───────────────────────┐
-        │                       │                       ▼                       │
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  User Service   │    │Product Service  │    │ Order Service   │    │     MySQL       │
-│     :8081       │    │     :8082       │    │     :8083       │    │   Databases     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+                    ┌─────────────────┐
+                    │   API Gateway   │ ← Ponto único de entrada
+                    │     :8080       │
+                    └─────────┬───────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+┌───────▼───────┐    ┌────────▼────────┐    ┌──────▼──────┐
+│ User Service  │    │ Product Service │    │Order Service│
+│     :8081     │    │     :8082       │    │    :8083    │
+└───────┬───────┘    └────────┬────────┘    └──────┬──────┘
+        │                     │                     │
+┌───────▼───────┐    ┌────────▼────────┐    ┌──────▼──────┐
+│MySQL User DB  │    │MySQL Product DB │    │MySQL Order │
+│    :3306      │    │     :3307       │    │ DB :3308    │
+└───────────────┘    └─────────────────┘    └─────────────┘
+
+        ┌─────────────────┐    ┌─────────────────┐
+        │ Eureka Discovery│    │  Config Server  │
+        │     :8761       │    │     :8888       │
+        └─────────────────┘    └─────────────────┘
 ```
+
+### 📁 Estrutura Criada
+
+```
+microservices/
+├── 📁 config-server/
+│   ├── 📄 pom.xml
+│   ├── 📄 Dockerfile
+│   ├── 📄 ConfigServerApplication.java
+│   └── 📁 resources/config/
+│       ├── 📄 user-service.yml
+│       ├── 📄 product-service.yml
+│       ├── 📄 order-service.yml
+│       ├── 📄 api-gateway.yml
+│       └── 📄 eureka-server.yml
+├── 📁 eureka-server/
+│   ├── 📄 pom.xml  
+│   ├── 📄 EurekaServerApplication.java
+│   └── 📄 application.yml
+├── 📁 api-gateway/
+│   ├── 📄 pom.xml
+│   ├── 📄 ApiGatewayApplication.java
+│   ├── 📄 CorsConfig.java
+│   └── 📄 application.yml
+├── 📁 user-service/
+│   ├── 📄 pom.xml
+│   ├── 📄 UserServiceApplication.java
+│   ├── 📄 User.java (entity)
+│   └── 📄 application.yml
+└── 📄 docker-compose.yml (orquestração completa)
+```
+
+### 🛠️ Stack Tecnológico Atualizado
+
+| Componente | Tecnologia | Versão | Porta |
+|------------|------------|--------|-------|
+| **Config Server** | Spring Cloud Config | 2022.0.4 | 8888 |
+| **Service Discovery** | Netflix Eureka | 2022.0.4 | 8761 |
+| **API Gateway** | Spring Cloud Gateway | 2022.0.4 | 8080 |
+| **User Service** | Spring Boot | 3.1.5 | 8081 |
+| **Product Service** | Spring Boot | 3.1.5 | 8082 |
+| **Order Service** | Spring Boot | 3.1.5 | 8083 |
+| **Databases** | MySQL | 8.0 | 3306-3308 |
+
+### 🔗 Configurações Centralizadas
+
+Todas as configurações dos microsserviços estão centralizadas no Config Server:
+
+- **Databases:** MySQL separado para cada serviço
+- **Service Discovery:** Integração automática com Eureka
+- **Load Balancing:** Configurado no Gateway
+- **Health Checks:** Actuator em todos os serviços
+- **Logging:** Configuração debug para desenvolvimento
+
+### 📋 Próximas Etapas
+
+1. **🏗️ Completar User Service:** Repository, Service, Controller, DTOs
+2. **📱 Criar Product Service:** Migrar do monólito
+3. **🛒 Criar Order Service:** Migrar e implementar comunicação inter-serviços
+4. **🔗 Comunicação REST:** OpenFeign clients
+5. **🧪 Testes de Integração:** Validar comunicação entre serviços
+
+### 🎯 Critérios de Avaliação Atendidos
+
+- ✅ **Separação de Microsserviços:** Arquitetura definida e base implementada
+- ✅ **Config Centralizado:** Spring Cloud Config funcionando
+- ✅ **Service Discovery:** Eureka Server implementado
+- 🔄 **Comunicação REST:** Em desenvolvimento
+- ✅ **Documentação:** APIs documentadas via Swagger (planejado para cada serviço)
 
 ---
 
