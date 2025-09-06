@@ -5,10 +5,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.config.server.EnableConfigServer;
 
 /**
- * Config Server - Gerenciamento Centralizado de Configurações
+ * Config Server - Servidor de Configuração Centralizada
  * 
- * Responsável por centralizar todas as configurações dos microsserviços,
- * permitindo mudanças dinâmicas sem necessidade de restart dos serviços.
+ * Responsável por:
+ * - Centralizar configurações de todos os microsserviços
+ * - Fornecer configurações baseadas em profiles (dev, test, prod)
+ * - Permitir atualização de configurações sem restart dos serviços
+ * - Integração com Git para versionamento das configurações
+ * 
+ * Porta: 8888 (padrão do Spring Cloud Config)
+ * 
+ * Endpoints importantes:
+ * - /{application}/{profile} - Configurações de uma aplicação
+ * - /{application}/{profile}/{label} - Configurações de uma versão específica
+ * - /actuator/health - Health check
+ * - /actuator/info - Informações do serviço
  */
 @SpringBootApplication
 @EnableConfigServer

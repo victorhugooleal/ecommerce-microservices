@@ -1,14 +1,27 @@
+# ===========================================
+# User Service - Configurações Centralizadas
+# ===========================================
 server:
   port: 8081
 
 spring:
   application:
     name: user-service
+  profiles:
+    active: dev
+    
+  # Banco de dados MySQL
   datasource:
     url: jdbc:mysql://localhost:3306/user_db?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
-    password: root
+    password: admin123
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      
+  # JPA/Hibernate
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,27 +30,74 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
-  config:
-    import: configserver:http://config-user:config-pass@localhost:8888
+        use_sql_comments: true
+        
+  # Jackson (JSON serialization)
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: NON_NULL
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
 
+# Eureka Service Discovery
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
     fetch-registry: true
     register-with-eureka: true
+    registry-fetch-interval-seconds: 30
   instance:
     prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
 
+# Actuator - Monitoramento
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info,metrics,prometheus,env
   endpoint:
     health:
       show-details: always
+  health:
+    db:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+# JWT Configuration
+jwt:
+  secret: ecommerce-user-service-secret-key-2023-muito-seguro-para-producao
+  expiration: 86400 # 24 horas em segundos
+
+# Security
+security:
+  bcrypt:
+    strength: 12
+
+# Logging
+logging:
+  level:
+    com.ecommerce.userservice: INFO
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level [%X{traceId},%X{spanId}] %logger{36} - %msg%n"
+
+# Info da aplicação
+info:
+  app:
+    name: User Service
+    description: Microservice for user management and authentication
+    version: 1.0.0
 
 # JWT Configuration
 jwt:

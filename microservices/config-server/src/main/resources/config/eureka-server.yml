@@ -1,33 +1,65 @@
+# ===========================================
+# Eureka Server - Configurações Centralizadas
+# ===========================================
 server:
   port: 8761
 
 spring:
   application:
     name: eureka-server
+  profiles:
+    active: dev
 
+# Configurações do Eureka Server
 eureka:
   instance:
     hostname: localhost
     prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
   client:
+    # O Eureka Server não precisa se registrar nem buscar outros serviços
     register-with-eureka: false
     fetch-registry: false
     service-url:
       defaultZone: http://localhost:8761/eureka/
   server:
+    # Desabilitar self-preservation em desenvolvimento
     enable-self-preservation: false
     eviction-interval-timer-in-ms: 10000
+    renewal-percent-threshold: 0.49
+    # Configurações de sincronização
+    peer-eureka-nodes-update-interval-ms: 30000
+    peer-eureka-status-refresh-time-interval-ms: 30000
 
+# Actuator - Monitoramento
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info,metrics,prometheus,env,eureka
   endpoint:
     health:
       show-details: always
+  info:
+    env:
+      enabled: true
 
+# Logging
 logging:
+  level:
+    com.netflix.eureka: INFO
+    com.netflix.discovery: INFO
+    org.springframework.cloud.netflix.eureka: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Info da aplicação
+info:
+  app:
+    name: Eureka Server
+    description: Service Discovery and Registry for E-commerce Microservices
+    version: 1.0.0
   level:
     com.netflix.eureka: OFF
     com.netflix.discovery: OFF

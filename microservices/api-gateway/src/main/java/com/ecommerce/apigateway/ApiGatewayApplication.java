@@ -5,10 +5,30 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
- * API Gateway - Ponto único de entrada
+ * API Gateway - Ponto Único de Entrada
  * 
- * Responsável por rotear todas as requisições para os microsserviços
- * apropriados, aplicando filtros de segurança e load balancing.
+ * Responsável por:
+ * - Roteamento inteligente para microsserviços
+ * - Load balancing automático
+ * - Circuit breaker para resiliência
+ * - CORS configuration
+ * - Autenticação e autorização centralizadas
+ * - Rate limiting e throttling
+ * - Logging e monitoramento de requests
+ * 
+ * Porta: 8080
+ * 
+ * Rotas disponíveis:
+ * - /api/v1/users/** → user-service (8081)
+ * - /api/v1/auth/** → user-service (8081)
+ * - /api/v1/products/** → product-service (8082)
+ * - /api/v1/orders/** → order-service (8083)
+ * - /eureka/web → eureka-server web UI (8761)
+ * 
+ * Features:
+ * - Service Discovery via Eureka
+ * - Circuit Breaker com Resilience4j
+ * - Fallback endpoints para alta disponibilidade
  */
 @SpringBootApplication
 @EnableDiscoveryClient

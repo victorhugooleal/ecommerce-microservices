@@ -1,3 +1,6 @@
+# ===========================================
+# Config Server - Configurações Centralizadas
+# ===========================================
 server:
   port: 8888
 
@@ -5,28 +8,63 @@ spring:
   application:
     name: config-server
   profiles:
-    active: native
+    active: native,git
   cloud:
     config:
       server:
+        # Configuração nativa (arquivos locais)
         native:
           search-locations: classpath:/config
+        # Configuração Git (para produção)
+        git:
+          uri: file://${user.home}/config-repo
+          default-label: main
+          clone-on-start: true
+          force-pull: true
+          timeout: 10
         default-label: main
+        health:
+          repositories:
+            git:
+              order: 1
+              enabled: true
   security:
     user:
-      name: config-user
-      password: config-pass
+      name: configuser
+      password: configpass
+      roles: ADMIN
 
+# Actuator - Monitoramento e Métricas
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info,env,configprops,refresh,metrics,loggers
   endpoint:
     health:
       show-details: always
+    info:
+      enabled: true
+  info:
+    env:
+      enabled: true
 
+# Informações da aplicação
+info:
+  app:
+    name: "@project.name@"
+    description: "Centralized Configuration Server for E-commerce Microservices"
+    version: "@project.version@"
+    java:
+      version: "@java.version@"
+
+# Logging detalhado
 logging:
   level:
-    org.springframework.cloud.config: DEBUG
+    org.springframework.cloud.config: INFO
+    org.springframework.security: INFO
     com.ecommerce: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
