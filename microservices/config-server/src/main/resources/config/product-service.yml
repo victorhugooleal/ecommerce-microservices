@@ -102,7 +102,20 @@ services:
   user-service:
     url: http://user-service
 
-logging:
-  level:
-    com.ecommerce: DEBUG
-    org.hibernate.SQL: DEBUG
+---
+# ===========================================
+# Docker Profile - Configurações para Container
+# ===========================================
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:mysql://mysql-product:3306/product_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: productapp
+    password: productpass123
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/

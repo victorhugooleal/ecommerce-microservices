@@ -132,3 +132,21 @@ logging:
   level:
     com.ecommerce: DEBUG
     org.hibernate.SQL: DEBUG
+
+---
+# ===========================================
+# Docker Profile - Configurações para Container
+# ===========================================
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:mysql://mysql-order:3306/order_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: orderapp
+    password: orderpass123
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/

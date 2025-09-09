@@ -1,5 +1,5 @@
 spring:
   application:
-    name: api-gateway
+    name: product-service
   config:
     import: configserver:http://configuser:configpass@config-server:8888

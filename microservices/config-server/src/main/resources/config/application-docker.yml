@@ -1,0 +1,37 @@
+# Docker profile configuration for Config Server
+spring:
+  config:
+    activate:
+      on-profile: docker
+  cloud:
+    config:
+      server:
+        git:
+          uri: file:///app/config-repo
+          default-label: main
+  security:
+    user:
+      name: configuser
+      password: configpass
+
+server:
+  port: 8888
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.config: DEBUG
+    root: INFO

@@ -31,6 +31,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRole(User.Role role);
 
     /**
+     * Busca usuários ativos
+     */
+    List<User> findByActiveTrue();
+
+    /**
      * Busca usuários por nome (LIKE)
      */
     @Query("SELECT u FROM User u WHERE u.name LIKE %:name%")

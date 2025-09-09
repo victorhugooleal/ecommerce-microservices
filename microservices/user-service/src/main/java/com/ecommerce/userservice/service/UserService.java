@@ -228,7 +228,7 @@ public class UserService implements UserDetailsService {
             }
 
             // Gerar token JWT
-            String jwt = jwtUtils.generateJwtToken(user.getEmail(), user.getRole(), user.getId());
+            String jwt = jwtUtils.generateJwtToken(user.getEmail(), user.getRole().name(), user.getId());
 
             log.info("Autenticação realizada com sucesso para usuário ID: {}", user.getId());
 

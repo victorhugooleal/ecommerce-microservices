@@ -256,7 +256,7 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado - ID: " + productId));
 
-        return product.isActive() && product.getStockQuantity() >= requestedQuantity;
+        return product.getActive() && product.getStockQuantity() >= requestedQuantity;
     }
 
     /**

@@ -63,3 +63,20 @@ info:
   level:
     com.netflix.eureka: OFF
     com.netflix.discovery: OFF
+
+---
+# ===========================================
+# Docker Profile - Configurações para Container
+# ===========================================
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+eureka:
+  instance:
+    hostname: eureka-server
+    prefer-ip-address: false
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/

@@ -8,26 +8,13 @@ spring:
   application:
     name: config-server
   profiles:
-    active: native,git
+    active: native
   cloud:
     config:
       server:
         # Configuração nativa (arquivos locais)
         native:
           search-locations: classpath:/config
-        # Configuração Git (para produção)
-        git:
-          uri: file://${user.home}/config-repo
-          default-label: main
-          clone-on-start: true
-          force-pull: true
-          timeout: 10
-        default-label: main
-        health:
-          repositories:
-            git:
-              order: 1
-              enabled: true
   security:
     user:
       name: configuser

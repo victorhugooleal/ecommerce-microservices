@@ -40,7 +40,7 @@ public class OrderDataLoader implements CommandLineRunner {
      */
     private boolean shouldLoadData() {
         try {
-            return orderService.findAll().isEmpty();
+            return orderService.getAllOrders().isEmpty();
         } catch (Exception e) {
             log.warn("Erro ao verificar pedidos existentes: {}", e.getMessage());
             return false;
@@ -61,7 +61,7 @@ public class OrderDataLoader implements CommandLineRunner {
             // Pedidos do usuário 3 (manager@example.com)
             createUser3Orders();
 
-            log.info("📦 Total de pedidos de teste criados: {}", orderService.findAll().size());
+            log.info("📦 Total de pedidos de teste criados: {}", orderService.getAllOrders().size());
             
         } catch (Exception e) {
             log.error("❌ Erro ao carregar dados de pedidos: {}", e.getMessage(), e);
@@ -79,17 +79,17 @@ public class OrderDataLoader implements CommandLineRunner {
                 .paymentMethod("CREDIT_CARD")
                 .notes("Pedido de inauguração da loja")
                 .items(List.of(
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(1L)
                                 .quantity(2)
                                 .notes("Cor: Preto")
                                 .build(),
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(2L)
                                 .quantity(1)
                                 .notes("iPhone 14 Pro Max")
                                 .build(),
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(3L)
                                 .quantity(3)
                                 .notes("Camiseta básica")
@@ -104,12 +104,12 @@ public class OrderDataLoader implements CommandLineRunner {
                 .paymentMethod("PIX")
                 .notes("Entrega rápida solicitada")
                 .items(List.of(
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(4L)
                                 .quantity(1)
                                 .notes("Dell Inspiron 15")
                                 .build(),
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(5L)
                                 .quantity(2)
                                 .notes("Livro técnico")
@@ -143,12 +143,12 @@ public class OrderDataLoader implements CommandLineRunner {
                 .paymentMethod("DEBIT_CARD")
                 .notes("Presente de aniversário")
                 .items(List.of(
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(3L)
                                 .quantity(5)
                                 .notes("Tamanhos variados")
                                 .build(),
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(6L)
                                 .quantity(2)
                                 .notes("Calça jeans")
@@ -163,12 +163,12 @@ public class OrderDataLoader implements CommandLineRunner {
                 .paymentMethod("BOLETO")
                 .notes("Material de estudo")
                 .items(List.of(
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(5L)
                                 .quantity(3)
                                 .notes("Coleção completa")
                                 .build(),
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(7L)
                                 .quantity(1)
                                 .notes("Tênis de corrida")
@@ -202,12 +202,12 @@ public class OrderDataLoader implements CommandLineRunner {
                 .paymentMethod("CREDIT_CARD")
                 .notes("Decoração do escritório")
                 .items(List.of(
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(8L)
                                 .quantity(1)
                                 .notes("Sofá 3 lugares")
                                 .build(),
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(9L)
                                 .quantity(2)
                                 .notes("Panela antiaderente")
@@ -222,12 +222,12 @@ public class OrderDataLoader implements CommandLineRunner {
                 .paymentMethod("PIX")
                 .notes("Setup gamer")
                 .items(List.of(
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(10L)
                                 .quantity(1)
                                 .notes("Monitor 4K")
                                 .build(),
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(1L)
                                 .quantity(1)
                                 .notes("Notebook Dell")
@@ -242,7 +242,7 @@ public class OrderDataLoader implements CommandLineRunner {
                 .paymentMethod("CREDIT_CARD")
                 .notes("Compra rápida")
                 .items(List.of(
-                        CreateOrderDTO.OrderItemDTO.builder()
+                        CreateOrderDTO.CreateOrderItemDTO.builder()
                                 .productId(11L)
                                 .quantity(1)
                                 .notes("Relógio smartwatch")

@@ -1,33 +1,231 @@
 services:
-  ecommerce-monolith:
-    build: .
-    container_name: ecommerce-monolith
+  # ===================
+  # DATABASES
+  # ===================
+  mysql-user:
+    image: mysql:8.0
+    container_name: mysql-user-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: user_db
+      MYSQL_USER: userapp
+      MYSQL_PASSWORD: userpass123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_user_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - microservices-network
+
+  mysql-product:
+    image: mysql:8.0
+    container_name: mysql-product-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: product_db
+      MYSQL_USER: productapp
+      MYSQL_PASSWORD: productpass123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_product_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - microservices-network
+
+  mysql-order:
+    image: mysql:8.0
+    container_name: mysql-order-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: order_db
+      MYSQL_USER: orderapp
+      MYSQL_PASSWORD: orderpass123
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_order_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - microservices-network
+
+  # ===================
+  # INFRASTRUCTURE SERVICES
+  # ===================
+  config-server:
+    build:
+      context: ./microservices/config-server
+      dockerfile: Dockerfile
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8888/actuator/health || exit 1"]
+      timeout: 30s
+      retries: 10
+      start_period: 60s
+    networks:
+      - microservices-network
+
+  eureka-server:
+    build:
+      context: ./microservices/eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      timeout: 30s
+      retries: 10
+      start_period: 90s
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build:
+      context: ./microservices/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - JAVA_OPTS=-Xmx512m -Xms256m
+      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    restart: unless-stopped
-    
-  # Para desenvolvimento futuro - PostgreSQL
-  # postgres:
-  #   image: postgres:15
-  #   container_name: ecommerce-postgres
-  #   environment:
-  #     POSTGRES_DB: ecommerce
-  #     POSTGRES_USER: ecommerce_user
-  #     POSTGRES_PASSWORD: ecommerce_pass
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   restart: unless-stopped
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      timeout: 30s
+      retries: 10
+      start_period: 120s
+    networks:
+      - microservices-network
 
-# volumes:
-#   postgres_data:
+  # ===================
+  # BUSINESS SERVICES
+  # ===================
+  user-service:
+    build:
+      context: ./microservices/user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-user:3306/user_db
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      mysql-user:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1"]
+      timeout: 30s
+      retries: 10
+      start_period: 120s
+    networks:
+      - microservices-network
+
+  product-service:
+    build:
+      context: ./microservices/product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-product:3306/product_db
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      mysql-product:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/actuator/health || exit 1"]
+      timeout: 30s
+      retries: 10
+      start_period: 120s
+    networks:
+      - microservices-network
+
+  order-service:
+    build:
+      context: ./microservices/order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-order:3306/order_db
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      mysql-order:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8083/actuator/health || exit 1"]
+      timeout: 30s
+      retries: 10
+      start_period: 150s
+    networks:
+      - microservices-network
+
+# ===================
+# VOLUMES
+# ===================
+volumes:
+  mysql_user_data:
+  mysql_product_data:
+  mysql_order_data:
+
+# ===================
+# NETWORKS
+# ===================
+networks:
+  microservices-network:
+    driver: bridge

@@ -2,4 +2,4 @@ spring:
   application:
     name: user-service
   config:
-    import: configserver:http://config-user:config-pass@localhost:8888
+    import: configserver:http://configuser:configpass@config-server:8888
